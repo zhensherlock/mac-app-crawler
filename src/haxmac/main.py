@@ -24,6 +24,6 @@ for i in range(1, 1):
     apps_list.extend(currentPageData['apps_list'])
 
 
-with open('../output/haxmac.json', 'w') as f:
+with open('../../output/haxmac.json', 'w') as f:
     json.dump(apps_list, f)
 
