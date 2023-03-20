@@ -1,0 +1,43 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Haxmac Spider
+
+
+on:
+  push:
+    tags:
+      - 'haxmac-*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+    - uses: actions/checkout@v3
+      -
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Execute Python script
+      run: python ../../src/haxmac/main.py
+
+    - name: Upload to TencentCloud COS
+    uses: TencentCloud/cos-action@v1
+    with:
+      secret_id: ${{ secrets.TENCENT_CLOUD_SECRET_ID }}
+      secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
+      cos_bucket: ${{ secrets.COS_BUCKET }}
+      cos_region: ${{ secrets.COS_REGION }}
+      local_path: output
+      remote_path: mac-app-crawler/db
+      clean: true
