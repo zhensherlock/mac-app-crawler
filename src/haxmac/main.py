@@ -17,7 +17,7 @@ max_page_number = int(page1Data['soup'].select_one('.page-nav.td-pb-padding-side
 
 apps_list = page1Data['apps_list']
 
-for i in range(1, max_page_number):
+for i in range(1, 1):
     wait_time = utils.generate_interval_time()
     time.sleep(wait_time)
     currentPageData = utils.get_data('https://haxmac.cc/page/{0}/'.format(i))
