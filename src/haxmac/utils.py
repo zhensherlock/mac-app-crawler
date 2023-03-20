@@ -51,3 +51,5 @@ def get_data(url):
         'soup': data['soup'],
         'apps_list': data['apps_list']
     }
+
+
