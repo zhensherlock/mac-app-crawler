@@ -2,6 +2,8 @@ import requests
 import random
 from bs4 import BeautifulSoup
 
+from src.utils.sqlite import SQLiteDB
+
 
 def generate_interval_time():
     return random.randint(50, 70)
@@ -53,3 +55,15 @@ def get_data(url):
     }
 
 
+def d(data):
+    db = SQLiteDB('haxmac.db')
+    db.execute(
+        'INSERT INTO mac_app_info (name, version, description, download_link, source) VALUES (?, ?, ?, ?, ?)',
+        (
+            data['name'],
+            data['version'],
+            data['description'],
+            data['download_link'],
+            data['source']
+        )
+    )

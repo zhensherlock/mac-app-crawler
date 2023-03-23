@@ -19,6 +19,7 @@ def download_obj(remote_file, local_file):
     )
     response['Body'].get_stream_to_file(local_file)
 
+
 def upload_cloud():
     secret_id = os.environ['secret_id']
     secret_key = os.environ['secret_key']
