@@ -2,7 +2,6 @@ import json
 import utils
 import time
 
-
 # with open('../output/apps.json') as f:
 #     outputData = json.load(f)
 
@@ -17,14 +16,13 @@ max_page_number = int(page1Data['soup'].select_one('.page-nav.td-pb-padding-side
 
 apps_list = page1Data['apps_list']
 
+# utils.handle_list(apps_list)
+
 for i in range(1, 1):
     wait_time = utils.generate_interval_time()
     time.sleep(wait_time)
     currentPageData = utils.get_data('https://haxmac.cc/page/{0}/'.format(i))
     apps_list.extend(currentPageData['apps_list'])
 
-
 with open('haxmac_db.json', 'w') as f:
     json.dump(apps_list, f)
-
-
