@@ -2,7 +2,6 @@ import requests
 import random
 import re
 from bs4 import BeautifulSoup
-
 from src.utils.sqlite import SQLiteDB
 
 
