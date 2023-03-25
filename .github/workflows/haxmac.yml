@@ -34,7 +34,7 @@ jobs:
           secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
           cos_bucket: ${{ secrets.TENCENT_CLOUD_COS_BUCKET }}
           cos_region: ${{ secrets.TENCENT_CLOUD_COS_REGION }}
-        run: python src/haxmac/main.py
+        run: python src/haxmac.py
 
 #      - name: Upload to TencentCloud COS
 #        uses: zkqiang/tencent-cos-action@v0.1.0

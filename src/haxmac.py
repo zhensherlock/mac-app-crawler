@@ -1,9 +1,9 @@
 # import json
-import utils
 import time
-from src.utils.tencent_cos import TencentCOS
+from utils import tencent
+import haxmac_utils as utils
 
-cos = TencentCOS()
+cos = tencent.TencentCOS()
 cos.download_file('db/haxmac.db', 'haxmac.db')
 
 # with open('../output/haxmac.json') as f:
@@ -17,7 +17,7 @@ max_page_number = int(page1Data['soup'].select_one('.page-nav.td-pb-padding-side
 
 utils.handle_list(page1Data['apps_list'])
 
-for i in range(2, 3):
+for i in range(2, 2):
     wait_time = utils.generate_interval_time()
     time.sleep(wait_time)
     currentPageData = utils.get_data('https://haxmac.cc/page/{0}/'.format(i))
