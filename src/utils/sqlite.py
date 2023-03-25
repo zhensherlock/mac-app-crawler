@@ -27,6 +27,9 @@ class SQLiteDB:
             self.cursor.execute(sql)
         return self.cursor.fetchone()
 
+    def get_last_rowid(self):
+        return self.cursor.lastrowid
+
     def __del__(self):
         self.cursor.close()
         self.conn.close()

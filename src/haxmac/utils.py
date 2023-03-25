@@ -1,8 +1,9 @@
-import requests
+# import requests
 import random
 import re
 from bs4 import BeautifulSoup
-# from src.utils.sqlite import SQLiteDB
+import cloudscraper
+from src.utils.sqlite import SQLiteDB
 
 
 def generate_interval_time():
@@ -10,11 +11,15 @@ def generate_interval_time():
 
 
 def get_page(url):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/111.0.0.0 Safari/537.36 '
-    }
-    response = requests.get(url, headers)
+    # headers = {
+    #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
+    #                   'Chrome/111.0.0.0 Safari/537.36',
+    #     'Referer': 'https://www.google.com/',
+    #     'Cookie': ''
+    # }
+    # response = requests.get(url, headers)
+    scraper = cloudscraper.create_scraper(delay=10, browser={'custom': 'ScraperBot/1.0', })
+    response = scraper.get(url)
     if response.status_code == 200:
         return response.text
     return None
@@ -57,40 +62,103 @@ def get_data(url):
     }
 
 
-# def handle_list(data):
-#     for row in data:
-#         handle_row_data(row)
-#
+def handle_list(data):
+    for row in data:
+        handle_row_data(row)
 
-# def handle_row_data(row_data):
-#     title = row_data['title']
-#     regex = r"(\w+(?:\s+\w+)*)\s+(\d+\.\d+\.\d+)"
-#     match = re.match(regex, title)
-#     name, version = match.group(1), match.group(2)
-#     data = {
-#         'title': title,
-#         'name': name,
-#         'latest_version': version,
-#         'description': row_data['description'],
-#         'detail_link': row_data['detail_link'],
-#         'category_link': row_data['category_link'],
-#         'download_link': row_data['download_link']
-#     }
-#     db = SQLiteDB('haxmac.db')
-#     app = db.fetchone('SELECT count(1) FROM mac_app_info WHERE name = ?', name)
-#
-#     return data
-#
-#
-# def insert_data(data):
-#     db = SQLiteDB('haxmac.db')
-#     db.execute(
-#         'INSERT INTO mac_app_info (name, version, description, download_link, source) VALUES (?, ?, ?, ?, ?)',
-#         (
-#             data['name'],
-#             data['version'],
-#             data['description'],
-#             data['download_link'],
-#             data['source']
-#         )
-#     )
+
+def match_name_version(string):
+    regexes = [
+        r'^([\w\s]+?)\s+v?(\d[\d\.]+)\s+Cracked.*$',
+        r'(\w+)\s([\d\.]+\s\([\d]+\))',
+        r'(\w+\s\w+)\s(\d+-\d+-\d+)',
+        r'(\w+\s\w+\s\w+)\s(\d+\.\d+\.\d+\s\w+)'
+    ]
+
+    # pattern = r"^([\w\s]+?)\s+v?([\d\.]+)\s+\(([\d]+)\)\s+Cracked.*$"
+    # pattern = r"^([\w\s]+?)\s+v?([\d\.]+)\s+Cracked.*$"
+    # pattern = r'^([\w\s]+?)\s+v?(\d[\d\.]+)\s+.*$'
+    # pattern = r'^([\w\s]+?)\s+v?(\d[\d\.]+).*Cracked.*for\s+macOS.*$'
+    # pattern = r'(\w+\s\w+)\s(\d+-\d+-\d+)'
+
+    obj = {
+        'name': '',
+        'version': ''
+    }
+    for regex in regexes:
+        pattern = re.compile(regex)
+        match = pattern.search(string)
+        if match:
+            obj['name'] = match.group(1)
+            obj['version'] = match.group(2)
+            return obj
+    return obj
+
+
+def handle_row_data(row_data):
+    title = row_data['title']
+    obj = match_name_version(title)
+    name, version = obj['name'], obj['version']
+    description = row_data['description']
+    detail_link = row_data['detail_link']
+    category_link = row_data['category_link']
+    download_link = parse_download_link(row_data)
+    db = SQLiteDB('haxmac.db')
+    app = db.fetchone('SELECT * FROM mac_app_info WHERE detail_link = ?', [detail_link])
+    if app is None:
+        db.execute(
+            'INSERT INTO mac_app_info (title, name, latest_version, description, detail_link, category_link, '
+            'download_link) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (
+                title,
+                name,
+                version,
+                description,
+                detail_link,
+                category_link,
+                download_link
+            )
+        )
+
+        db.execute(
+            'INSERT INTO mac_app_version (version, detail_link, category_link, download_link, app_id) '
+            'VALUES (?, ?, ?, ?, ?)',
+            (
+                version,
+                detail_link,
+                category_link,
+                download_link,
+                db.get_last_rowid()
+            )
+        )
+    elif version != app[3]:
+        db.execute(
+            'update mac_app_info set title = ?, name = ?, latest_version = ?, description = ?, detail_link = ?,'
+            ' category_link = ?, download_link = ?, update_time = datetime("now", "+8 hours") where id = ?',
+            (
+                title,
+                name,
+                version,
+                description,
+                detail_link,
+                category_link,
+                download_link,
+                app[0]
+            )
+        )
+
+        db.execute(
+            'INSERT INTO mac_app_version (version, detail_link, category_link, download_link, app_id) '
+            'VALUES (?, ?, ?, ?, ?)',
+            (
+                version,
+                detail_link,
+                category_link,
+                download_link,
+                app[0]
+            )
+        )
+
+
+def parse_download_link(row_data):
+    return ''

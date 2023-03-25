@@ -3,9 +3,9 @@ from qcloud_cos import CosConfig
 from qcloud_cos import CosS3Client
 
 
-class QCloudCos:
+class TencentCOS:
     def __init__(self, secret_id=os.environ['secret_id'], secret_key=os.environ['secret_key'],
-                 region=os.environ['cos_bucket'], bucket=os.environ['cos_region']):
+                 region=os.environ['cos_region'], bucket=os.environ['cos_bucket']):
         self.secret_id = secret_id
         self.secret_key = secret_key
         self.region = region
@@ -24,7 +24,7 @@ class QCloudCos:
         response['Body'].get_stream_to_file(local_path)
 
     def upload_file(self, cos_path, local_path):
-        response = self.client.upload_file(
+        self.client.upload_file(
             Bucket=self.bucket,
             LocalFilePath=local_path,
             Key=cos_path,
@@ -32,4 +32,4 @@ class QCloudCos:
             MAXThread=10,
             EnableMD5=False
         )
-        print(response['ETag'])
+        # print(response['ETag'])

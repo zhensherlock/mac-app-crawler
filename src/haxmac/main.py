@@ -1,28 +1,28 @@
-import json
+# import json
 import utils
 import time
+from src.utils.tencent_cos import TencentCOS
 
-# with open('../output/apps.json') as f:
+cos = TencentCOS()
+cos.download_file('db/haxmac.db', 'haxmac.db')
+
+# with open('../output/haxmac.json') as f:
 #     outputData = json.load(f)
-
-# with open('../assets/apps.json') as f:
-#     data = json.load(f)
+#     utils.handle_list(outputData)
 #
-# print(data)
 
 page1Data = utils.get_data('https://haxmac.cc/page/1/')
 
 max_page_number = int(page1Data['soup'].select_one('.page-nav.td-pb-padding-side .last').text.strip())
 
-apps_list = page1Data['apps_list']
+utils.handle_list(page1Data['apps_list'])
 
-# utils.handle_list(apps_list)
-
-for i in range(1, 1):
+for i in range(2, 3):
     wait_time = utils.generate_interval_time()
     time.sleep(wait_time)
     currentPageData = utils.get_data('https://haxmac.cc/page/{0}/'.format(i))
-    apps_list.extend(currentPageData['apps_list'])
+    utils.handle_list(currentPageData['apps_list'])
 
-with open('haxmac_db.json', 'w') as f:
-    json.dump(apps_list, f)
+cos.upload_file('db/haxmac.db', 'haxmac.db')
+# with open('haxmac_db.json', 'w') as f:
+#     json.dump(apps_list, f)
