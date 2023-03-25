@@ -3,7 +3,7 @@ import random
 import re
 from bs4 import BeautifulSoup
 import cloudscraper
-from src.utils.sqlite import SQLiteDB
+from utils import sqlite
 
 
 def generate_interval_time():
@@ -103,7 +103,7 @@ def handle_row_data(row_data):
     detail_link = row_data['detail_link']
     category_link = row_data['category_link']
     download_link = parse_download_link(row_data)
-    db = SQLiteDB('haxmac.db')
+    db = sqlite.SQLiteDB('haxmac.db')
     app = db.fetchone('SELECT * FROM mac_app_info WHERE detail_link = ?', [detail_link])
     if app is None:
         db.execute(
