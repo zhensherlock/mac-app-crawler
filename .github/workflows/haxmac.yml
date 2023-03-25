@@ -6,8 +6,6 @@ name: Haxmac Spider
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'haxmac-*'
 
