@@ -72,13 +72,13 @@ def match_name_version(string):
         r'^(.*?)\s(\d+\.\d+\s\w+\s\d+\s\(\d+\))',
         r'([\w\s|-].+?)\s(\d\.\d\s\w\d\w)',  # TinkerTool System 8.4 U2B Cracked for macOS
         r'([\w\s|-].+?)\s+v(\d+\.\d+\.\d+\.\d+)',  # ON1 Portrait AI 2023.1 v17.1.1.13620 Cracked for macOS
-        r'^(.*?)\s+v?(\d+\.\d+\.\d+\.\d+)'  # Capture One 23 Pro 16.1.1.16 Cracked for macOS
-        r'^(.*?)\s+v?(\d+\.\d+)'  # Adobe Illustrator 2023 v27.0 Cracked for macOS
-        r'^(.*?)\s+v?(\d+\.\d+\.\d+)'  # DVD-Cloner 2022 v9.60.734 Cracked for macOS
+        r'^(.*?)\s+v?(\d+\.\d+\.\d+\.\d+)',  # Capture One 23 Pro 16.1.1.16 Cracked for macOS
+        r'^(.*?)\s+v(\d+\.\d+\.\d+)',  # DVD-Cloner 2022 v9.60.734 Cracked for macOS
+        r'^(.*?)\s+v(\d+\.\d+)',  # Adobe Illustrator 2023 v27.0 Cracked for macOS
         r'^([\w\s|-].+?)\s+v?(\d[(\d\w)\.]+(\s\w+\s\d+)?(-[\w].+?)?\s(\([\d\w]+\))?)',
         r'([\w\s|-].+?)\s([\d\.]+\s\([\d]+\))',
         r'(\w+\s\w+)\s(\d+-\d+-\d+)',
-        r'(\w+\s\w+\s\w+)\s(\d+\.\d+\.\d+\s\w+)'
+        r'(\w+\s\w+\s\w+)\s(\d+\.\d+\.\d+\s\w+)',
     ]
 
     obj = {
@@ -104,10 +104,10 @@ def handle_row_data(row_data):
     category_link = row_data['category_link']
     download_link = parse_download_link(row_data)
     db = sqlite.SQLiteDB('haxmac.db')
-    app = db.fetchone('SELECT * FROM mac_app_info WHERE detail_link = ?', [detail_link])
+    app = db.fetchone('SELECT * FROM mac_app WHERE detail_link = ?', [detail_link])
     if app is None:
         db.execute(
-            'INSERT INTO mac_app_info (title, name, latest_version, description, detail_link, category_link, '
+            'INSERT INTO mac_app (title, name, latest_version, description, detail_link, category_link, '
             'download_link) VALUES (?, ?, ?, ?, ?, ?, ?)',
             (
                 title,
@@ -121,7 +121,7 @@ def handle_row_data(row_data):
         )
 
         db.execute(
-            'INSERT INTO mac_app_version (version, detail_link, category_link, download_link, app_id) '
+            'INSERT INTO mac_app_versions (version, detail_link, category_link, download_link, app_id) '
             'VALUES (?, ?, ?, ?, ?)',
             (
                 version,
@@ -133,7 +133,7 @@ def handle_row_data(row_data):
         )
     elif version != app[3]:
         db.execute(
-            'update mac_app_info set title = ?, name = ?, latest_version = ?, description = ?, detail_link = ?,'
+            'update mac_app set title = ?, name = ?, latest_version = ?, description = ?, detail_link = ?,'
             ' category_link = ?, download_link = ?, update_time = datetime("now", "+8 hours") where id = ?',
             (
                 title,
@@ -148,7 +148,7 @@ def handle_row_data(row_data):
         )
 
         db.execute(
-            'INSERT INTO mac_app_version (version, detail_link, category_link, download_link, app_id) '
+            'INSERT INTO mac_app_versions (version, detail_link, category_link, download_link, app_id) '
             'VALUES (?, ?, ?, ?, ?)',
             (
                 version,
