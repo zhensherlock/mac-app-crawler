@@ -69,23 +69,17 @@ def handle_list(data):
 
 def match_name_version(string):
     regexes = [
-        r'(\w+\s\w+)\s(\d+\.\d+\s\w+\s\d+)',  # Sublime Merge 2.0 Build 2085 Cracked for macOS
-        r'([\w\s|-].+?)\s(\d\.\d\.\d)',  # PDFelement Pro + OCR 9.3.3 Cracked for macOS
+        r'^(.*?)\s(\d+\.\d+\s\w+\s\d+\s\(\d+\))',
         r'([\w\s|-].+?)\s(\d\.\d\s\w\d\w)',  # TinkerTool System 8.4 U2B Cracked for macOS
-        r'([\w\s|-].+?)\s(\d\.\d\.\w+)',  # Danger Scavenger 2.0.8a Cracked Mac Game
-        r'([\w\s|-].+?)\s(\d\.\d\w+)',  # Papetura 1.1b2 Cracked Mac Game
         r'([\w\s|-].+?)\s+v(\d+\.\d+\.\d+\.\d+)',  # ON1 Portrait AI 2023.1 v17.1.1.13620 Cracked for macOS
-        r'^([\w\s|-].+?)\s+v?(\d[\d\.]+(-[\w].+?)?\s(\([\d]+\))?)',
+        r'^(.*?)\s+v?(\d+\.\d+\.\d+\.\d+)'  # Capture One 23 Pro 16.1.1.16 Cracked for macOS
+        r'^(.*?)\s+v?(\d+\.\d+)'  # Adobe Illustrator 2023 v27.0 Cracked for macOS
+        r'^(.*?)\s+v?(\d+\.\d+\.\d+)'  # DVD-Cloner 2022 v9.60.734 Cracked for macOS
+        r'^([\w\s|-].+?)\s+v?(\d[(\d\w)\.]+(\s\w+\s\d+)?(-[\w].+?)?\s(\([\d\w]+\))?)',
         r'([\w\s|-].+?)\s([\d\.]+\s\([\d]+\))',
         r'(\w+\s\w+)\s(\d+-\d+-\d+)',
         r'(\w+\s\w+\s\w+)\s(\d+\.\d+\.\d+\s\w+)'
     ]
-
-    # pattern = r"^([\w\s]+?)\s+v?([\d\.]+)\s+\(([\d]+)\)\s+Cracked.*$"
-    # pattern = r"^([\w\s]+?)\s+v?([\d\.]+)\s+Cracked.*$"
-    # pattern = r'^([\w\s]+?)\s+v?(\d[\d\.]+)\s+.*$'
-    # pattern = r'^([\w\s]+?)\s+v?(\d[\d\.]+).*Cracked.*for\s+macOS.*$'
-    # pattern = r'(\w+\s\w+)\s(\d+-\d+-\d+)'
 
     obj = {
         'name': '',
