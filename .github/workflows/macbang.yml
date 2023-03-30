@@ -32,4 +32,4 @@ jobs:
           secret_key: ${{ secrets.TENCENT_CLOUD_SECRET_KEY }}
           cos_bucket: ${{ secrets.TENCENT_CLOUD_COS_BUCKET }}
           cos_region: ${{ secrets.TENCENT_CLOUD_COS_REGION }}
-        run: python src/xclient.py
+        run: python src/macbang.py
