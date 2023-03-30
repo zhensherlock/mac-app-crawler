@@ -37,6 +37,8 @@ class MacAppVersions(Base):
     own_download_link = Column(String)
     app_id = Column(Integer, ForeignKey('mac_app.id'))
     source = Column(String, default='website')
+    web_post_time = Column(DateTime)
+    article_id = Column(Integer, ForeignKey('mac_article.id'))
     create_time = Column(DateTime, default=datetime.now)
 
     app = relationship('MacApp', back_populates='versions')

@@ -1,9 +1,10 @@
-# from utils import tencent
+import time
 import re
+from utils import tencent
 import macbang_utils as utils
 
-# cos = tencent.TencentCOS()
-# cos.download_file('db/macbang.db', 'macbang.db')
+cos = tencent.TencentCOS()
+cos.download_file('db/macbang.db', 'macbang.db')
 
 
 page1Data = utils.get_data('https://macbang.net/page/1/')
@@ -17,10 +18,10 @@ if max_page_number_match:
 
 utils.handle_list(page1Data['apps_list'])
 
-# for i in range(2, max_page_number + 1):
-#     wait_time = utils.generate_interval_time()
-#     time.sleep(wait_time)
-#     currentPageData = utils.get_data('https://macbang.net/page/{0}/'.format(i))
-#     utils.handle_list(currentPageData['apps_list'])
+for i in range(2, max_page_number + 1):
+    wait_time = utils.generate_interval_time()
+    time.sleep(wait_time)
+    currentPageData = utils.get_data('https://macbang.net/page/{0}/'.format(i))
+    utils.handle_list(currentPageData['apps_list'])
 
-# cos.upload_file('db/macbang.db', 'macbang.db')
+cos.upload_file('db/macbang.db', 'macbang.db')

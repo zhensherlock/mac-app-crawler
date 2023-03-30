@@ -17,8 +17,8 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def generate_interval_time():
-    return random.randint(50, 70)
+def generate_interval_time(a=50, b=70):
+    return random.randint(a, b)
 
 
 def get_page(url):
@@ -35,7 +35,7 @@ def parse_list_page(html):
     article_list = []
     for article in article_nodes:
         article_title = article.select_one('.type-list-title').text.strip()
-        article_datetime = datetime.strptime(article.select_one('.type-list-date').text.strip(), '%Y年%m月%d日')
+        article_datetime = article.select_one('.type-list-date').text.strip()
         article_desc = article.select_one('.type-list-excerpt').text
         article_thumbnail = article.select_one('.wp-post-image')
         article_detail_link = article.select_one('.type-list-title a')['href']
@@ -62,9 +62,9 @@ def parse_list_page(html):
         }
         if article_thumbnail:
             article_data['thumbnail'] = article_thumbnail['src']
-        detail_page_html = get_page(article_detail_link)
-        wait_time = generate_interval_time()
+        wait_time = generate_interval_time(10, 20)
         time.sleep(wait_time)
+        detail_page_html = get_page(article_detail_link)
         if detail_page_html:
             detail_data = parse_detail_page(detail_page_html)
             article_data['content'] = detail_data['content']
@@ -88,18 +88,18 @@ def parse_detail_page(html):
         article_id = article_id_match.group()
     content_node = soup.select_one('.entry.themeform')
     article_download_link = ''
-    if content_node.select_one('.dlipp-cont-wp'):
-        article_download_link = get_download_link(article_id)
+    for download_button in content_node.select('.dlipp-dl-btn.j-wbdlbtn-dlipp'):
+        article_download_link += get_download_link(article_id, download_button['data-rid'])
     for remove_node in content_node.find_all(class_=['dlipp-cont-wp', 'wbp-cbm', 'clear']):
         remove_node.extract()
     return {
         'id': article_id,
-        'content': content_node,
+        'content': content_node.prettify(),
         'link': article_download_link
     }
 
 
-def get_download_link(article_id):
+def get_download_link(article_id, download_type):
     url = 'https://macbang.net/wp-admin/admin-ajax.php'
     headers = {
         'authority': 'macbang.net',
@@ -121,7 +121,7 @@ def get_download_link(article_id):
     data = {
         'action': 'wb_dlipp_front',
         'pid': article_id,
-        'rid': 'baidu'
+        'rid': download_type
     }
     response = requests.post(url, headers=headers, data=data)
     url = ''
@@ -149,7 +149,8 @@ def handle_list(data):
 
 def match_name_version_slogan(string):
     regexes = [
-        r'(.+?)\sv?(\d[(\d\w)\.]+[a-zA-Z\d]+(\s?\[\w+\])?(\s\w+[(\d\w)\s]+[a-zA-Z\d])?(\s\([\d\w]+\))?)(.+)',
+        r"(.+?)\sv?(\d[(\d\w)\.]+[a-zA-Z\d]+(\s?\[\w+\])?(\s[Dev|fixed|beta][a-zA-Z]+[(\d\w)\s]+[a-zA-Z\d])?(\s\(["
+        r"\d\w]+\))?)(.+)",
     ]
 
     obj = {
@@ -161,9 +162,10 @@ def match_name_version_slogan(string):
         pattern = re.compile(regex)
         match = pattern.search(string)
         if match:
+            match_groups = match.groups()
             obj['name'] = match.group(1)
             obj['version'] = match.group(2)
-            obj['slogan'] = match.group(3)
+            obj['slogan'] = match.group(len(match_groups)).strip()
             return obj
     return obj
 
@@ -173,7 +175,7 @@ def handle_row_data(row_data):
     obj = match_name_version_slogan(title)
     name, version, slogan = obj['name'], obj['version'], obj['slogan']
     description = row_data['description']
-    post_datetime = row_data['datetime']
+    post_datetime = datetime.strptime(row_data['datetime'], '%Y年%m月%d日')
     thumbnail = row_data['thumbnail']
     detail_link = row_data['detail_link']
     download_link = row_data['link']
@@ -193,7 +195,7 @@ def handle_row_data(row_data):
     if article is None:
         article = MacArticle(title=title, description=description, content=content, thumbnail=thumbnail,
                              detail_link=detail_link, download_link=download_link, category_id=mac_category.id,
-                             web_post_id=web_post_id, datetime=post_datetime)
+                             web_post_id=web_post_id, web_post_time=post_datetime)
         session.add(article)
         session.commit()
     if name is None:
@@ -205,16 +207,16 @@ def handle_row_data(row_data):
         session.add(app)
         session.commit()
         mac_app_version = MacAppVersions(version=version, detail_link=detail_link, download_link=download_link,
-                                         app_id=app.id)
+                                         app_id=app.id, web_post_time=post_datetime, article_id=article.id)
         session.add(mac_app_version)
         session.commit()
     elif app.latest_version != version:
         mac_app_version = MacAppVersions(version=version, detail_link=detail_link, download_link=download_link,
-                                         app_id=app.id)
+                                         app_id=app.id, web_post_time=post_datetime, article_id=article.id)
         session.add(mac_app_version)
         session.commit()
 
-    if session.query(MacCategoryApps).filter_by(app_id=app.id, category_id=mac_category.id) is None:
+    if session.query(MacCategoryApps).filter_by(app_id=app.id, category_id=mac_category.id).first() is None:
         mac_category_app = MacCategoryApps(app_id=app.id, category_id=mac_category.id)
         session.add(mac_category_app)
         session.commit()
