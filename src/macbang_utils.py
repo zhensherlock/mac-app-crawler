@@ -8,7 +8,7 @@ from datetime import datetime
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from utils.macbang_orm import MacApp, MacAppVersions, MacCategory, MacCategoryApps, MacArticle
+from utils.macbang_orm import MacApp, MacAppVersions, MacCategory, MacCategoryApps, MacArticle, MacTag, MacArticleTags
 
 engine = create_engine('sqlite:///macbang.db')
 
@@ -17,7 +17,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def generate_interval_time(a=50, b=70):
+def generate_interval_time(a=10, b=20):
     return random.randint(a, b)
 
 
@@ -48,13 +48,13 @@ def parse_list_page(html):
                 'name': category_name,
                 'href': category_href
             })
-
         article_data = {
             'title': article_title,
             'datetime': article_datetime,
             'description': article_desc,
             'detail_link': article_detail_link,
             'categories': categories,
+            'tags': [],
             'thumbnail': '',
             'content': '',
             'link': '',
@@ -62,7 +62,7 @@ def parse_list_page(html):
         }
         if article_thumbnail:
             article_data['thumbnail'] = article_thumbnail['src']
-        wait_time = generate_interval_time(10, 20)
+        wait_time = generate_interval_time(5, 10)
         time.sleep(wait_time)
         detail_page_html = get_page(article_detail_link)
         if detail_page_html:
@@ -70,6 +70,7 @@ def parse_list_page(html):
             article_data['content'] = detail_data['content']
             article_data['link'] = detail_data['link']
             article_data['web_post_id'] = detail_data['id']
+            article_data['tags'] = detail_data['tags']
 
         article_list.append(article_data)
 
@@ -86,6 +87,15 @@ def parse_detail_page(html):
     article_id_match = re.search(r'\d+', article_node['id'])
     if article_id_match:
         article_id = article_id_match.group()
+    tag_nodes = soup.select('.post-tags a[rel="tag"]')
+    tags = []
+    for tag_node in tag_nodes:
+        tag_name = tag_node.text.strip()
+        tag_href = tag_node['href']
+        tags.append({
+            'name': tag_name,
+            'href': tag_href
+        })
     content_node = soup.select_one('.entry.themeform')
     article_download_link = ''
     for download_button in content_node.select('.dlipp-dl-btn.j-wbdlbtn-dlipp'):
@@ -95,7 +105,8 @@ def parse_detail_page(html):
     return {
         'id': article_id,
         'content': content_node.prettify(),
-        'link': article_download_link
+        'link': article_download_link,
+        'tags': tags
     }
 
 
@@ -181,6 +192,7 @@ def handle_row_data(row_data):
     download_link = row_data['link']
     content = row_data['content']
     categories = row_data['categories']
+    tags = row_data['tags']
     web_post_id = row_data['web_post_id']
 
     mac_category = None
@@ -220,3 +232,14 @@ def handle_row_data(row_data):
         mac_category_app = MacCategoryApps(app_id=app.id, category_id=mac_category.id)
         session.add(mac_category_app)
         session.commit()
+
+    for item in tags:
+        mac_tag = session.query(MacTag).filter_by(title=item['name']).first()
+        if mac_tag is None:
+            mac_tag = MacTag(title=item['name'], link=item['href'])
+            session.add(mac_tag)
+            session.commit()
+        if session.query(MacArticleTags).filter_by(article_id=article.id, tag_id=mac_tag.id).first() is None:
+            mac_article_tag = MacArticleTags(article_id=article.id, tag_id=mac_tag.id)
+            session.add(mac_article_tag)
+            session.commit()

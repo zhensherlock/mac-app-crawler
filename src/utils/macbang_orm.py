@@ -62,6 +62,7 @@ class MacCategoryApps(Base):
 
     app_id = Column(Integer, ForeignKey('mac_app.id'), primary_key=True)
     category_id = Column(Integer, ForeignKey('mac_category.id'), primary_key=True)
+    create_time = Column(DateTime, default=datetime.now)
 
 
 class MacArticle(Base):
@@ -81,3 +82,19 @@ class MacArticle(Base):
     create_time = Column(DateTime, default=datetime.now)
 
     category = relationship('MacCategory', back_populates='articles')
+
+
+class MacTag(Base):
+    __tablename__ = 'mac_tag'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String, nullable=False)
+    description = Column(String)
+    link = Column(String, nullable=False)
+    create_time = Column(DateTime, default=datetime.now)
+
+
+class MacArticleTags(Base):
+    __tablename__ = 'mac_article_tags'
+    article_id = Column(Integer, ForeignKey('mac_article.id'), primary_key=True)
+    tag_id = Column(Integer, ForeignKey('mac_tag.id'), primary_key=True)
+    create_time = Column(DateTime, default=datetime.now)
