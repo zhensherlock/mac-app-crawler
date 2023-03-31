@@ -2,6 +2,7 @@ import time
 import re
 from utils import tencent
 import macbang_utils as utils
+from utils.global_utils import generate_interval_time
 
 cos = tencent.TencentCOS()
 cos.download_file('db/macbang.db', 'macbang.db')
@@ -19,7 +20,7 @@ if max_page_number_match:
 utils.handle_list(page1Data['apps_list'])
 
 for i in range(2, max_page_number + 1):
-    wait_time = utils.generate_interval_time()
+    wait_time = generate_interval_time()
     time.sleep(wait_time)
     currentPageData = utils.get_data('https://macbang.net/page/{0}/'.format(i))
     utils.handle_list(currentPageData['apps_list'])

@@ -1,15 +1,12 @@
-import random
 import re
 import time
-
-from bs4 import BeautifulSoup
-import cloudscraper
-from datetime import datetime
 import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from utils.constants import URL_SEPARATOR
+from utils.global_utils import get_page, generate_interval_time
 from utils.macbang_orm import MacApp, MacAppVersions, MacCategory, MacCategoryApps, MacArticle, MacTag, MacArticleTags
 
 engine = create_engine('sqlite:///macbang.db')
@@ -17,18 +14,6 @@ engine = create_engine('sqlite:///macbang.db')
 Session = sessionmaker(bind=engine)
 
 session = Session()
-
-
-def generate_interval_time(a=10, b=20):
-    return random.randint(a, b)
-
-
-def get_page(url):
-    scraper = cloudscraper.create_scraper(delay=10, browser={'custom': 'ScraperBot/1.0', })
-    response = scraper.get(url)
-    if response.status_code == 200:
-        return response.text
-    return None
 
 
 def parse_list_page(html):
