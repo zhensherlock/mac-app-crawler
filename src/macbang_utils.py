@@ -8,6 +8,8 @@ from datetime import datetime
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from utils.constants import URL_SEPARATOR
 from utils.macbang_orm import MacApp, MacAppVersions, MacCategory, MacCategoryApps, MacArticle, MacTag, MacArticleTags
 
 engine = create_engine('sqlite:///macbang.db')
@@ -97,15 +99,15 @@ def parse_detail_page(html):
             'href': tag_href
         })
     content_node = soup.select_one('.entry.themeform')
-    article_download_link = ''
+    article_download_links = []
     for download_button in content_node.select('.dlipp-dl-btn.j-wbdlbtn-dlipp'):
-        article_download_link += get_download_link(article_id, download_button['data-rid'])
+        article_download_links.append(get_download_link(article_id, download_button['data-rid']))
     for remove_node in content_node.find_all(class_=['dlipp-cont-wp', 'wbp-cbm', 'clear']):
         remove_node.extract()
     return {
         'id': article_id,
         'content': content_node.prettify(),
-        'link': article_download_link,
+        'link': URL_SEPARATOR.join(article_download_links),
         'tags': tags
     }
 
