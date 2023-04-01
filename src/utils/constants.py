@@ -1,1 +1,2 @@
 URL_SEPARATOR = ',||,'
+IMAGE_SEPARATOR = ',||,'
