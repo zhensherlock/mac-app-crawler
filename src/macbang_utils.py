@@ -124,7 +124,11 @@ def get_download_link(article_id, download_type):
     response = requests.post(url, headers=headers, data=data)
     url = ''
     if response.status_code == 200:
-        url = response.json()['data']['url']
+        res_json = response.json()
+        pwd = res_json['data']['pwd']
+        url = res_json['data']['url']
+        if download_type == 'baidu' and not ('pwd=' in url):
+            url += '?pwd=' + pwd
     return url
 
 
@@ -230,3 +234,28 @@ def handle_row_data(row_data):
             mac_article_tag = MacArticleTags(article_id=article.id, tag_id=mac_tag.id)
             session.add(mac_article_tag)
             session.commit()
+
+
+def fix_link():
+    apps = session.query(MacApp).all()
+    for app in apps:
+        detail_page_html = get_page(app.detail_link)
+        if detail_page_html:
+            detail_data = parse_detail_page(detail_page_html)
+            link = detail_data['link']
+            if link is not None and link != '' and app.download_link != link:
+                app.download_link = link
+        wait_time = generate_interval_time(5, 10)
+        time.sleep(wait_time)
+
+    app_versions = session.query(MacAppVersions).all()
+    for app_version in app_versions:
+        detail_page_html = get_page(app_version.detail_link)
+        if detail_page_html:
+            detail_data = parse_detail_page(detail_page_html)
+            link = detail_data['link']
+            if link is not None and link != '' and app_version.download_link != link:
+                app_version.download_link = link
+        wait_time = generate_interval_time(5, 10)
+        time.sleep(wait_time)
+    session.commit()
