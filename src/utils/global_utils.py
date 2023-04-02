@@ -39,7 +39,7 @@ def get_tag_name():
 def get_page_range(tag_name):
     if tag_name is None:
         return None
-    match = re.search(r'page:(\d+)-(\d+)', tag_name)
+    match = re.search(r'page=(\d+)-(\d+)', tag_name)
     if match:
         return {
             'start': int(match.group(1)),
