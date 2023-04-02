@@ -1,3 +1,5 @@
+import os
+import re
 import cloudscraper
 import random
 
@@ -25,3 +27,21 @@ def get_page(url, **kwargs):
 
 def generate_interval_time(a=10, b=20):
     return random.randint(a, b)
+
+
+def get_tag_name():
+    full_ref = os.environ.get('GITHUB_REF')
+    tag_prefix = 'refs/tags/'
+    tag_name = full_ref[len(tag_prefix):] if full_ref.startswith(tag_prefix) else None
+    return tag_name
+
+
+def get_page_range(tag_name):
+    if tag_name is None:
+        return None
+    match = re.search(r'page:(\d+)-(\d+)', tag_name)
+    if match:
+        return {
+            'start': int(match.group(1)),
+            'end': int(match.group(2))
+        }
