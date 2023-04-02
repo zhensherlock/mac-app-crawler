@@ -15,9 +15,8 @@ if page_range is None:
 
 page1Data = utils.get_data('https://xclient.info/s/{0}/'.format(page_range['start']))
 
-max_page_number = int(page1Data['soup'].select_one('.page-navigator li:nth-last-child(2)').text.strip())
-
-page_range['end'] = max_page_number
+if page_range['end'] is None:
+    page_range['end'] = int(page1Data['soup'].select_one('.page-navigator li:nth-last-child(2)').text.strip())
 
 utils.handle_list(page1Data['apps_list'])
 
