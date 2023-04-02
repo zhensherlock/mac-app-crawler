@@ -17,7 +17,7 @@ session = Session()
 
 def parse_list_page(html):
     soup = BeautifulSoup(html, 'html.parser')
-    app_nodes = soup.select('.post_list > li:first-child')
+    app_nodes = soup.select('.post_list > li')
     apps_list = []
     for app in app_nodes:
         app_title = app.find('h3').text.strip()
