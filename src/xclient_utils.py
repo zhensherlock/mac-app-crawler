@@ -132,11 +132,11 @@ def parse_download_page(html):
         return download_href
     if '城通网盘下载' in download_type and ctwp_password_parameter in download_link:
         return download_link
-    if '城通网盘下载' in download_type and not(ctwp_password_parameter in download_link):
+    if '城通网盘下载' in download_type and not (ctwp_password_parameter in download_link):
         return '${0}?p=${1}'.format(download_link, download_password)
     if '百度云盘下载' in download_type and baidu_password_parameter in download_link:
         return download_link
-    if '百度云盘下载' in download_type and not(baidu_password_parameter in download_link):
+    if '百度云盘下载' in download_type and not (baidu_password_parameter in download_link):
         return '${0}?pwd=${1}'.format(download_link, download_password)
 
 
@@ -207,10 +207,15 @@ def handle_row_data(row_data):
     content = row_data['content']
     view_count = row_data['view_count']
     download_count = row_data['download_count']
-    update_time = datetime.strptime(row_data['update_time'], '%Y-%m-%d %H:%M:%S')
     categories = row_data['categories']
     versions = row_data['versions']
     tags = row_data['tags']
+    update_time_str = row_data['update_time']
+    update_time = None
+    try:
+        update_time = datetime.strptime(update_time_str, '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        print('Error: Incorrect update data ' + update_time_str)
 
     app = session.query(MacApp).filter_by(detail_link=detail_link).first()
     if app is None:
@@ -248,8 +253,13 @@ def handle_row_data(row_data):
     for item in versions:
         mac_app_version = session.query(MacAppVersion).filter_by(app_id=app.id, version=item['version']).first()
         if mac_app_version is None:
-            mac_app_version = MacAppVersion(app_id=app.id, version=item['version'], language=item['language'],
-                                            post_time=datetime.strptime(item['post_time'], '%Y-%m-%d'),
-                                            download_link=item['download_link'], size=item['size'])
+            post_time_str = item['post_time']
+            post_time = None
+            try:
+                post_time = datetime.strptime(post_time_str, '%Y-%m-%d')
+            except ValueError:
+                print('Error: Incorrect post data ' + post_time_str)
+            mac_app_version = MacAppVersion(app_id=app.id, version=item['version'], download_link=item['download_link'],
+                                            post_time=post_time, language=item['language'], size=item['size'])
             session.add(mac_app_version)
             session.commit()
