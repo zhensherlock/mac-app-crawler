@@ -237,26 +237,26 @@ def handle_row_data(row_data):
 
 
 def fix_data():
-    apps = session.query(MacApp).all()
-    for app in apps:
-        detail_page_html = get_page(app.detail_link)
-        if detail_page_html:
-            detail_data = parse_detail_page(detail_page_html)
-            link = detail_data['link']
-            app.description = app.description.strip()
-            if link is not None and link != '' and app.download_link != link:
-                app.download_link = link
-        wait_time = generate_interval_time(3, 5)
-        time.sleep(wait_time)
-
-    # app_versions = session.query(MacAppVersions).all()
-    # for app_version in app_versions:
-    #     detail_page_html = get_page(app_version.detail_link)
+    # apps = session.query(MacApp).all()
+    # for app in apps:
+    #     detail_page_html = get_page(app.detail_link)
     #     if detail_page_html:
     #         detail_data = parse_detail_page(detail_page_html)
     #         link = detail_data['link']
-    #         if link is not None and link != '' and app_version.download_link != link:
-    #             app_version.download_link = link
+    #         app.description = app.description.strip()
+    #         if link is not None and link != '' and app.download_link != link:
+    #             app.download_link = link
     #     wait_time = generate_interval_time(3, 5)
     #     time.sleep(wait_time)
+
+    app_versions = session.query(MacAppVersions).all()
+    for app_version in app_versions:
+        detail_page_html = get_page(app_version.detail_link)
+        if detail_page_html:
+            detail_data = parse_detail_page(detail_page_html)
+            link = detail_data['link']
+            if link is not None and link != '' and app_version.download_link != link:
+                app_version.download_link = link
+        wait_time = generate_interval_time(3, 5)
+        time.sleep(wait_time)
     session.commit()
