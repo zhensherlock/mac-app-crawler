@@ -236,7 +236,7 @@ def handle_row_data(row_data):
             session.commit()
 
 
-def fix_prod_data():
+def fix_data():
     apps = session.query(MacApp).all()
     for app in apps:
         detail_page_html = get_page(app.detail_link)
