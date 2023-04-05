@@ -39,7 +39,7 @@ def parse_list_page(html):
                 'href': category_href
             })
 
-        wait_time = generate_interval_time(1, 2)
+        wait_time = generate_interval_time(0, 1)
         time.sleep(wait_time)
         detail_page_html = get_page(app_detail_link)
         if detail_page_html:
@@ -94,7 +94,7 @@ def parse_detail_page(html, link):
         download_nodes = version_node.select('td:nth-child(5) a')
         download_links = []
         for download_node in download_nodes:
-            wait_time = generate_interval_time(1, 2)
+            wait_time = generate_interval_time(0, 1)
             time.sleep(wait_time)
             download_page_html = get_page(download_node['href'], headers={'referer': link})
             if download_page_html:
