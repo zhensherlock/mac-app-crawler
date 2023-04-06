@@ -33,3 +33,19 @@ class TencentCOS:
             EnableMD5=False
         )
         # print(response['ETag'])
+
+    def retry_download_file(self, cos_path, local_path):
+        while True:
+            try:
+                self.download_file(cos_path, local_path)
+                break
+            except:
+                continue
+
+    def retry_upload_file(self, cos_path, local_path):
+        while True:
+            try:
+                self.upload_file(cos_path, local_path)
+                break
+            except:
+                continue

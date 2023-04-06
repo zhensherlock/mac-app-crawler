@@ -25,6 +25,14 @@ def get_page(url, **kwargs):
     return None
 
 
+def retry_get_page(url, **kwargs):
+    while True:
+        try:
+            return get_page(url, **kwargs)
+        except:
+            continue
+
+
 def generate_interval_time(a=10, b=20):
     return random.randint(a, b)
 

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from utils.constants import URL_SEPARATOR, IMAGE_SEPARATOR
-from utils.global_utils import get_page, generate_interval_time
+from utils.global_utils import retry_get_page, generate_interval_time
 from utils.xclient_orm import MacApp, MacAppVersion, MacCategory, MacCategoryApp, MacTag, MacAppTag
 
 engine = create_engine('sqlite:///xclient.db')
@@ -41,7 +41,7 @@ def parse_list_page(html):
 
         wait_time = generate_interval_time(0, 1)
         time.sleep(wait_time)
-        detail_page_html = get_page(app_detail_link)
+        detail_page_html = retry_get_page(app_detail_link)
         if detail_page_html:
             detail_data = parse_detail_page(detail_page_html, app_detail_link)
             app_data['latest_version'] = detail_data['latest_version']
@@ -96,7 +96,7 @@ def parse_detail_page(html, link):
         for download_node in download_nodes:
             wait_time = generate_interval_time(0, 1)
             time.sleep(wait_time)
-            download_page_html = get_page(download_node['href'], headers={'referer': link})
+            download_page_html = retry_get_page(download_node['href'], headers={'referer': link})
             if download_page_html:
                 download_links.append(parse_download_page(download_page_html))
         versions.append({
@@ -141,7 +141,7 @@ def parse_download_page(html):
 
 
 def get_data(url):
-    html = get_page(url)
+    html = retry_get_page(url)
     if html is None:
         return None
     data = parse_list_page(html)
