@@ -128,7 +128,7 @@ def parse_download_page(html):
     download_password = download_node['data-clipboard-text'] if download_node.has_attr('data-clipboard-text') else ''
     ctwp_password_parameter = '?p={0}'.format(download_password)
     baidu_password_parameter = '?pwd=${0}'.format(download_password)
-    if 'http' in download_href:
+    if 'http' in download_href or 'magnet' in download_href:
         return download_href
     if '城通网盘下载' in download_type and ctwp_password_parameter in download_link:
         return download_link
