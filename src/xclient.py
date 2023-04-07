@@ -4,7 +4,7 @@ import xclient_utils as utils
 from utils.global_utils import generate_interval_time, get_tag_name, get_page_range
 
 cos = tencent.TencentCOS()
-cos.retry_download_file('db/xclient.db', 'xclient.db')
+cos.download_file('db/xclient.db', 'xclient.db')
 
 page_range = get_page_range(get_tag_name())
 if page_range is None:
@@ -26,4 +26,4 @@ for i in range(2, page_range['end'] + 1):
     currentPageData = utils.get_data('https://xclient.info/s/{0}/'.format(i))
     utils.handle_list(currentPageData['apps_list'])
 
-cos.retry_upload_file('db/xclient.db', 'xclient.db')
+cos.upload_file('db/xclient.db', 'xclient.db')
