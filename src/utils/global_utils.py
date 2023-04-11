@@ -2,6 +2,7 @@ import os
 import re
 import cloudscraper
 import random
+from flask import make_response
 
 
 def get_page(url, **kwargs):
@@ -53,3 +54,11 @@ def get_page_range(tag_name):
             'start': int(match.group(1)),
             'end': int(match.group(2))
         }
+
+
+def make_no_cache_response(content):
+    response = make_response(content)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response

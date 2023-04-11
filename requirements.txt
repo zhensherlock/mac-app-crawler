@@ -3,3 +3,6 @@ requests==2.28.2
 cos-python-sdk-v5==1.9.23
 cloudscraper~=1.2.69
 SQLAlchemy~=2.0.7
+urllib3~=1.26.15
+python-dateutil~=2.8.2
+Flask~=2.2.3

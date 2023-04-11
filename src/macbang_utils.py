@@ -3,7 +3,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, or_
 from sqlalchemy.orm import sessionmaker
 from utils.constants import URL_SEPARATOR
 from utils.global_utils import get_page, generate_interval_time
@@ -259,4 +259,36 @@ def fix_data():
                 app_version.download_link = link
         wait_time = generate_interval_time(3, 5)
         time.sleep(wait_time)
+    session.commit()
+
+
+def get_not_transferred_download_record():
+    app = session.query(MacApp).filter(
+        or_(MacApp.own_download_link.is_(None), MacApp.own_download_link == ''),
+        MacApp.download_link.isnot(None)
+    ).first()
+    if app:
+        return {
+            'data': app.to_json(),
+            'type': 'MacApp'
+        }
+    app_version = session.query(MacAppVersions).filter(
+        or_(MacAppVersions.own_download_link.is_(None), MacAppVersions.own_download_link == ''),
+        MacAppVersions.download_link.isnot(None)
+    ).first()
+    if app_version:
+        return {
+            'data': app_version.to_json(),
+            'type': 'MacAppVersions'
+        }
+    return None
+
+
+def set_transfer_link(record_id, record_type, record_link):
+    record = None
+    if record_type == 'MacApp':
+        record = session.query(MacApp).filter_by(id=record_id).first()
+    else:
+        record = session.query(MacAppVersions).filter_by(id=record_id).first()
+    record.own_download_link = record_link
     session.commit()

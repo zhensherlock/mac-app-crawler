@@ -26,6 +26,12 @@ class MacApp(Base):
     versions = relationship('MacAppVersions', back_populates='app')
     categories = relationship('MacCategory', secondary='mac_category_apps', back_populates='apps')
 
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
+
 
 class MacAppVersions(Base):
     __tablename__ = 'mac_app_versions'
@@ -43,6 +49,12 @@ class MacAppVersions(Base):
 
     app = relationship('MacApp', back_populates='versions')
 
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
+
 
 class MacCategory(Base):
     __tablename__ = 'mac_category'
@@ -56,6 +68,12 @@ class MacCategory(Base):
     apps = relationship('MacApp', secondary='mac_category_apps', back_populates='categories')
     articles = relationship('MacArticle', back_populates='category')
 
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
+
 
 class MacCategoryApps(Base):
     __tablename__ = 'mac_category_apps'
@@ -63,6 +81,12 @@ class MacCategoryApps(Base):
     app_id = Column(Integer, ForeignKey('mac_app.id'), primary_key=True)
     category_id = Column(Integer, ForeignKey('mac_category.id'), primary_key=True)
     create_time = Column(DateTime, default=datetime.now)
+
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
 
 
 class MacArticle(Base):
@@ -83,6 +107,12 @@ class MacArticle(Base):
 
     category = relationship('MacCategory', back_populates='articles')
 
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
+
 
 class MacTag(Base):
     __tablename__ = 'mac_tag'
@@ -92,9 +122,21 @@ class MacTag(Base):
     link = Column(String, nullable=False)
     create_time = Column(DateTime, default=datetime.now)
 
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
+
 
 class MacArticleTags(Base):
     __tablename__ = 'mac_article_tags'
     article_id = Column(Integer, ForeignKey('mac_article.id'), primary_key=True)
     tag_id = Column(Integer, ForeignKey('mac_tag.id'), primary_key=True)
     create_time = Column(DateTime, default=datetime.now)
+
+    def to_json(self):
+        obj_dict = self.__dict__
+        if '_sa_instance_state' in obj_dict:
+            del obj_dict['_sa_instance_state']
+        return obj_dict
