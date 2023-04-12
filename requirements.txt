@@ -6,3 +6,5 @@ SQLAlchemy~=2.0.7
 urllib3~=1.26.15
 python-dateutil~=2.8.2
 Flask~=2.2.3
+Flask_Cors~=3.0.10
+redis~=4.5.4
