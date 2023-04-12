@@ -18,12 +18,15 @@ def hello_world():
 
 @app.route('/redirect_link')
 def redirect_baidu_pan_link():
+    rc.delete('record')
     record = utils.get_not_transferred_download_record()
+    if record is None:
+        return ''
+    rc.set_dict('record', record)
     download_link_str = record['data']['download_link']
     download_links = download_link_str.split(URL_SEPARATOR)
     for link in download_links:
         if 'pan.baidu.com' in link:
-            rc.set_dict('record', record)
             return make_no_cache_response(redirect(link))
     return ''
 
